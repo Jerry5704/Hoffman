@@ -61,6 +61,3 @@ class financeYahooScraper():
 
         # Data parse
         self.raw_data = self.get_raw_data()
-        print(self.raw_data.text)
-
-t = financeYahooScraper()
