@@ -3,19 +3,12 @@
 
 import requests
 import time
-import configparser
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 class financeYahooScraper():
-
-    def get_configParser(self):
-        configParser = configparser.RawConfigParser()   
-        configFilePath = r'config.cfg'
-        configParser.read(configFilePath)
-        return configParser
 
     def get_url(self):
         return self.configParser.get('YAHOO', 'url')
