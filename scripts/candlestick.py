@@ -51,6 +51,9 @@ class Candlestick():
             self.lower_shadow = self.close - self.low
 
         # Candlestick types filled only when in collection
+        self.number = ""
         self.lenght_type = ""
         self.pattern = ""
-        self.trend = ""
+        self.trend_direction = ""
+        self.is_support = False
+        self.is_resistance = False

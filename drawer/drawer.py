@@ -6,6 +6,9 @@ from dataParser import dataParser
 
 class drawer():
 
+    def draw_support_line(self):
+        pass
+
     def draw_line_chart(self):
         self.prices = self.dataParser.get_prices(len(self.candlesticks_list), 0)
 
@@ -18,7 +21,22 @@ class drawer():
             x_axis.append(counter)
             counter += 1
 
-        plt.plot(x_axis, y_axis)
+        x_axis = list(reversed(x_axis))
+
+        plt.xlim([0, len(self.candlesticks_list)])
+
+        plt.plot(x_axis, y_axis, color="black")
+
+        #  draw support lines
+        for candlestick in self.candlesticks_list:
+            if candlestick.is_support:
+                plt.axhline(y = candlestick.close, xmin = candlestick.number/len(self.candlesticks_list) - 0.008, xmax = candlestick.number/len(self.candlesticks_list) + 0.01, color="yellow")
+        
+        #  draw resistance lines
+        for candlestick in self.candlesticks_list:
+            if candlestick.is_resistance:
+                plt.axhline(y = candlestick.close, xmin = candlestick.number/len(self.candlesticks_list) - 0.008, xmax = candlestick.number/len(self.candlesticks_list) + 0.01, color="blue")
+
         plt.show()
 
     def draw_candlestick_chart(self):
@@ -65,7 +83,7 @@ class drawer():
         for _ in self.opens:
             x_axis.append(counter)
             counter += 1
-        self.dates = list(reversed(self.dataParser.get_dates(len(self.candlesticks_list), 0)))
+        self.dates = self.dataParser.get_dates(len(self.candlesticks_list), 0)
         plt.xticks(x_axis, self.dates, rotation=45)
 
         #display candlestick chart
@@ -77,5 +95,5 @@ class drawer():
         self.dataParser = dataParser
         self.candlesticks_list = dataParser.candlesticks_list
 
-        # self.draw_line_chart()
-        self.draw_candlestick_chart()
+        self.draw_line_chart()
+        # self.draw_candlestick_chart()

@@ -75,22 +75,32 @@ class dataParser():
             return "marubozu"
         return "no pattern found"
 
-    def get_trend(self, candlestick, current_candlestick_index):
-        print(candlestick.date)
-        # self.long_ema = self.get_ema(26, current_candlestick_index)
-        # self.short_ema = self.get_ema(12, current_candlestick_index)
-        self.long_ema = self.get_ema(26, current_candlestick_index).mean()
-        self.short_ema = self.get_ema(12, current_candlestick_index).mean()
-        # print(self.long_ema)
-        # print(self.short_ema)
-        print(self.short_ema - self.long_ema)
-        # print(self.long_ema - self.short_ema)
-        # current_signal = self.get_signal(candlestick, current_candlestick_index)
+    def get_trend_direction(self, candlestick, current_candlestick_index):
+        pass
+
+    def get_is_support(self, candlestick, current_candlestick_index):
+        try:
+            if self.candlesticks_list[current_candlestick_index - 1].close > self.candlesticks_list[current_candlestick_index].close and  self.candlesticks_list[current_candlestick_index + 1].close > self.candlesticks_list[current_candlestick_index].close:
+                return True
+        except:
+            return False
+        return False
+
+    def get_is_resistance(self, candlestick, current_candlestick_index):
+        try:
+            if self.candlesticks_list[current_candlestick_index - 1].close < self.candlesticks_list[current_candlestick_index].close and  self.candlesticks_list[current_candlestick_index + 1].close < self.candlesticks_list[current_candlestick_index].close:
+                return True
+        except:
+            return False
+        return False
 
     def classify_candlestick(self, candlestick, current_candlestick_index):
+        candlestick.number = current_candlestick_index
         candlestick.length_type = self.get_candlesticks_length_type(candlestick, current_candlestick_index)
         candlestick.pattern = self.get_pattern(candlestick)
-        # candlestick.trend = self.get_trend(candlestick, current_candlestick_index)
+        candlestick.is_support = self.get_is_support(candlestick, current_candlestick_index)
+        candlestick.is_resistance = self.get_is_resistance(candlestick, current_candlestick_index)
+        # candlestick.trend_direction = self.get_trend_direction(candlestick, current_candlestick_index)
 
         current_candlestick_index += 1
         return candlestick
@@ -122,24 +132,29 @@ class dataParser():
             current_candlestick_index += 1
     
     def print_candlesticks(self):
+        candlestick_number = 0
         for candlestick in self.candlesticks_list:
-            # if candlestick.pattern != "no pattern found":
-                print("================================")
-                print(f"date: {candlestick.date}")
-                print(f"open: {candlestick.open}")
-                print(f"close: {candlestick.close}")
-                print(f"high: {candlestick.high}")
-                print(f"low: {candlestick.low}")
-                print(f"volume: {candlestick.volume}")
-                print(f"color: {candlestick.color}")
-                print(f"body: {candlestick.body}")
-                print(f"has upper wick?: {candlestick.has_upper_wick}")
-                print(f"has lower wick?: {candlestick.has_lower_wick}")
-                print(f"upper shadow: {candlestick.upper_shadow}")
-                print(f"lower shadow: {candlestick.lower_shadow}")
-                print(f"length type: {candlestick.length_type}")
-                print(f"pattern: {candlestick.pattern}")
-                print("================================")
+            candlestick_number += 1
+            # if candlestick.is_support is True:
+            print("================================")
+            print(f"candlestick number: {candlestick_number}")
+            print(f"date: {candlestick.date}")
+            print(f"open: {candlestick.open}")
+            print(f"close: {candlestick.close}")
+            print(f"high: {candlestick.high}")
+            print(f"low: {candlestick.low}")
+            print(f"volume: {candlestick.volume}")
+            print(f"color: {candlestick.color}")
+            print(f"body: {candlestick.body}")
+            print(f"has upper wick?: {candlestick.has_upper_wick}")
+            print(f"has lower wick?: {candlestick.has_lower_wick}")
+            print(f"upper shadow: {candlestick.upper_shadow}")
+            print(f"lower shadow: {candlestick.lower_shadow}")
+            print(f"length type: {candlestick.length_type}")
+            print(f"pattern: {candlestick.pattern}")
+            print(f"is support: {candlestick.is_support}")
+            print(f"is resistance: {candlestick.is_resistance}")
+            print("================================")
 
     def __init__(self, raw_data, configParser):
         self.raw_data = raw_data
