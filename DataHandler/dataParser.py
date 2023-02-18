@@ -1,13 +1,14 @@
 import datetime
 import statistics
+import configparser
 import pandas as pd
 
-from candlestick import Candlestick
+from DataForms.candlestick import Candlestick
 
 class dataParser():
 
     def get_frequency(self):
-        return self.configParser.get('YAHOO', 'url')
+        return "https://finance.yahoo.com/quote/%5EDJI/history?period1=1643334840&period2=1674856022&interval=<frequency>&filter=history&frequency=1d&includeAdjustedClose=true&guccounter=1"
 
     def get_month(self, month_name):
         if month_name == "Jan":
@@ -158,15 +159,15 @@ class dataParser():
 
     def __init__(self, raw_data, configParser):
         self.raw_data = raw_data
-        self.configParser = configParser
+        self.configParser = configparser
         self.frequency = self.get_frequency()
         self.data_lines_list = [line for line in self.raw_data.split('\n')]
         # self.data_lines_list = [line for line in self.raw_data.text.split('\n')]
         self.candlesticks_list = self.get_candlesticks_list()
         self.classify_candlesticks_list()
 
-        # with open ("data.text", "w") as file:
-        #     file.write(self.raw_data.text)
-        # print(self.raw_data.text)
+        with open ("data.text", "w") as file:
+            file.write(self.raw_data)
+        print(self.raw_data)
         self.print_candlesticks()
         

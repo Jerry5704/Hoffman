@@ -3,15 +3,24 @@
 
 import requests
 import time
+import configparser
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
+from DataHandler.configParser import configParser
+
 class financeYahooScraper():
 
     def get_url(self):
-        return self.configParser.get('YAHOO', 'url')
+        return "https://finance.yahoo.com/quote/%5EDJI/history?period1=1643334840&period2=1674856022&interval=<frequency>&filter=history&frequency=1d&includeAdjustedClose=true&guccounter=1"
+
+    def get_configParser(self):
+        configParser = configparser.RawConfigParser()   
+        configFilePath = r'config.cfg'
+        configParser.read(configFilePath)
+        return configParser
 
     def get_driver(self):
         driver = webdriver.Chrome()
@@ -53,4 +62,4 @@ class financeYahooScraper():
         self.scroll_down()
 
         # Data parse
-        self.raw_data = self.get_raw_data()
+        self.raw_data = self.get_raw_data().text
