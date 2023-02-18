@@ -4,6 +4,7 @@ import configparser
 import pandas as pd
 
 from DataForms.candlestick import Candlestick
+from DataForms.trendLine import TrendLine
 
 class dataParser():
 
@@ -101,7 +102,6 @@ class dataParser():
         candlestick.pattern = self.get_pattern(candlestick)
         candlestick.is_support = self.get_is_support(candlestick, current_candlestick_index)
         candlestick.is_resistance = self.get_is_resistance(candlestick, current_candlestick_index)
-        # candlestick.trend_direction = self.get_trend_direction(candlestick, current_candlestick_index)
 
         current_candlestick_index += 1
         return candlestick
@@ -131,6 +131,18 @@ class dataParser():
         for candlestick in self.candlesticks_list:
             self.classify_candlestick(candlestick, current_candlestick_index)
             current_candlestick_index += 1
+
+    def get_resistance_points_list(self):
+        current_candlestick_index = 0
+        for candlestick in self.candlesticks_list:
+            self.classify_candlestick(candlestick, current_candlestick_index)
+            current_candlestick_index += 1
+
+    def get_up_trendLine_candlesticks_list(self):
+        return TrendLine("up", self.support_candlesticks_list)
+
+    def get_down_trendLine_candlesticks_list(self):
+        return TrendLine("down", self.resistance_candlesticks_list)
     
     def print_candlesticks(self):
         candlestick_number = 0
@@ -162,12 +174,21 @@ class dataParser():
         self.configParser = configparser
         self.frequency = self.get_frequency()
         self.data_lines_list = [line for line in self.raw_data.split('\n')]
-        # self.data_lines_list = [line for line in self.raw_data.text.split('\n')]
         self.candlesticks_list = self.get_candlesticks_list()
         self.classify_candlesticks_list()
 
-        with open ("data.text", "w") as file:
-            file.write(self.raw_data)
-        print(self.raw_data)
-        self.print_candlesticks()
-        
+        # self.print_candlesticks()
+
+        self.resistance_candlesticks_list = [candlestick for candlestick in self.candlesticks_list if candlestick.is_resistance]
+        self.support_candlesticks_list = [candlestick for candlestick in self.candlesticks_list if candlestick.is_support]
+        self.up_trendLine_candlesticks_list = self.get_up_trendLine_candlesticks_list()
+        self.down_trendLine_candlesticks_list = self.get_down_trendLine_candlesticks_list()
+
+        # for candlestick in self.up_trendLine_candlesticks_list.trends_list:
+        #     print(candlestick)
+
+        # self.sideways_trendLine_list = self.get_sideways_trendLine_list()
+
+        # with open ("data.text", "w") as file:
+        #     file.write(self.raw_data)
+        # print(self.raw_data)

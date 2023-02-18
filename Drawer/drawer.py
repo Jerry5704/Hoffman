@@ -29,13 +29,52 @@ class drawer():
 
         #  draw support lines
         for candlestick in self.candlesticks_list:
+            x_values = []
+            y_values = []
             if candlestick.is_support:
-                plt.axhline(y = candlestick.close, xmin = candlestick.number/len(self.candlesticks_list) - 0.008, xmax = candlestick.number/len(self.candlesticks_list) + 0.01, color="yellow")
-        
+                x_values.append(candlestick.number + 0.5)   
+                x_values.append(candlestick.number + 1.5)   
+                y_values.append(candlestick.close)   
+                y_values.append(candlestick.close)   
+                plt.plot(x_values, y_values, color="yellow")
+
         #  draw resistance lines
         for candlestick in self.candlesticks_list:
+            x_values = []
+            y_values = []
             if candlestick.is_resistance:
-                plt.axhline(y = candlestick.close, xmin = candlestick.number/len(self.candlesticks_list) - 0.008, xmax = candlestick.number/len(self.candlesticks_list) + 0.01, color="blue")
+                x_values.append(candlestick.number + 0.5)   
+                x_values.append(candlestick.number + 1.5)   
+                y_values.append(candlestick.close)   
+                y_values.append(candlestick.close)   
+                plt.plot(x_values, y_values, color="cyan")
+
+        # draw up_trendlines
+        for candlesticks_lists in self.dataParser.up_trendLine_candlesticks_list.trends_list:
+            x_values = []
+            y_values = []
+            for candlestick in candlesticks_lists:
+                x_values.append(candlestick.number + 1)
+                y_values.append(candlestick.close)
+            plt.plot(x_values, y_values, color="yellow")
+        
+        # draw down_trendlines
+        for candlesticks_lists in self.dataParser.down_trendLine_candlesticks_list.trends_list:
+            x_values = []
+            y_values = []
+            for candlestick in candlesticks_lists:
+                x_values.append(candlestick.number + 1)
+                y_values.append(candlestick.close)
+            plt.plot(x_values, y_values, color="cyan")
+
+
+            # print("========")
+            # print(x_values)
+            # print("========")
+            # print(y_values)
+            # print("========")
+            
+            # plt.plot(x_values, y_values)
 
         plt.show()
 
