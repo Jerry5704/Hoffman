@@ -4,10 +4,7 @@ import numpy as np
 
 from DataHandler.dataParser import dataParser
 
-class drawer():
-
-    def draw_support_line(self):
-        pass
+class drawer():          
 
     def draw_line_chart(self):
         self.prices = self.dataParser.get_prices(len(self.candlesticks_list), 0)
@@ -50,7 +47,7 @@ class drawer():
                 plt.plot(x_values, y_values, color="cyan")
 
         # draw up_trendlines
-        for candlesticks_lists in self.dataParser.up_trendLine_candlesticks_list.trends_list:
+        for candlesticks_lists in self.dataParser.up_trendLine_candlesticks_list:
             x_values = []
             y_values = []
             for candlestick in candlesticks_lists:
@@ -59,7 +56,7 @@ class drawer():
             plt.plot(x_values, y_values, color="yellow")
         
         # draw down_trendlines
-        for candlesticks_lists in self.dataParser.down_trendLine_candlesticks_list.trends_list:
+        for candlesticks_lists in self.dataParser.down_trendLine_candlesticks_list:
             x_values = []
             y_values = []
             for candlestick in candlesticks_lists:
@@ -67,14 +64,11 @@ class drawer():
                 y_values.append(candlestick.close)
             plt.plot(x_values, y_values, color="cyan")
 
-
-            # print("========")
-            # print(x_values)
-            # print("========")
-            # print(y_values)
-            # print("========")
-            
-            # plt.plot(x_values, y_values)
+        # draw fans
+        for fan_list in self.dataParser.fans_list:
+            x_values = [fan_list[0].number + 1, fan_list[-1][0] + 1]
+            y_values = [fan_list[0].close, fan_list[-1][1]]
+            plt.plot(x_values, y_values, color="pink")
 
         plt.show()
 

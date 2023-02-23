@@ -5,6 +5,7 @@ import pandas as pd
 
 from DataForms.candlestick import Candlestick
 from DataForms.trendLine import TrendLine
+from DataForms.fan import Fan
 
 class dataParser():
 
@@ -96,6 +97,26 @@ class dataParser():
             return False
         return False
 
+    def get_next_resistance_candlestick_number(self, candlestick, current_candlestick_index):
+        for candlestick in self.candlesticks_list[current_candlestick_index + 1:]:
+            if candlestick.is_resistance:
+                return candlestick.number
+
+    def get_next_support_candlestick_number(self, candlestick, current_candlestick_index):
+        for candlestick in self.candlesticks_list[current_candlestick_index + 1:]:
+            if candlestick.is_support:
+                return candlestick.number
+
+    def get_previous_resistance_candlestick_number(self, candlestick, current_candlestick_index):
+        for candlestick in reversed(self.candlesticks_list[:current_candlestick_index - 1]):
+            if candlestick.is_resistance:
+                return candlestick.number
+        
+    def get_previous_support_candlestick_number(self, candlestick, current_candlestick_index):
+        for candlestick in reversed(self.candlesticks_list[:current_candlestick_index - 1]):
+            if candlestick.is_support:
+                return candlestick.number
+
     def classify_candlestick(self, candlestick, current_candlestick_index):
         candlestick.number = current_candlestick_index
         candlestick.length_type = self.get_candlesticks_length_type(candlestick, current_candlestick_index)
@@ -139,10 +160,13 @@ class dataParser():
             current_candlestick_index += 1
 
     def get_up_trendLine_candlesticks_list(self):
-        return TrendLine("up", self.support_candlesticks_list)
+        return TrendLine("up", self.support_candlesticks_list).trends_list
 
     def get_down_trendLine_candlesticks_list(self):
-        return TrendLine("down", self.resistance_candlesticks_list)
+        return TrendLine("down", self.resistance_candlesticks_list).trends_list
+
+    def get_fans_list(self):
+        return Fan(self.candlesticks_list, self.up_trendLine_candlesticks_list, self.down_trendLine_candlesticks_list).fans_list
     
     def print_candlesticks(self):
         candlestick_number = 0
@@ -169,11 +193,12 @@ class dataParser():
             print(f"is resistance: {candlestick.is_resistance}")
             print("================================")
 
-    def __init__(self, raw_data, configParser):
+    def __init__(self, raw_data, configParser, counter):
+        self.now = datetime
         self.raw_data = raw_data
         self.configParser = configparser
         self.frequency = self.get_frequency()
-        self.data_lines_list = [line for line in self.raw_data.split('\n')]
+        self.data_lines_list = [line for line in self.raw_data.split('\n') if line != "Download"]
         self.candlesticks_list = self.get_candlesticks_list()
         self.classify_candlesticks_list()
 
@@ -184,11 +209,14 @@ class dataParser():
         self.up_trendLine_candlesticks_list = self.get_up_trendLine_candlesticks_list()
         self.down_trendLine_candlesticks_list = self.get_down_trendLine_candlesticks_list()
 
+
+        # The Fan Principle
+        self.fans_list = self.get_fans_list()
+
         # for candlestick in self.up_trendLine_candlesticks_list.trends_list:
         #     print(candlestick)
 
         # self.sideways_trendLine_list = self.get_sideways_trendLine_list()
 
-        # with open ("data.text", "w") as file:
-        #     file.write(self.raw_data)
-        # print(self.raw_data)
+        with open (f"data{counter}.text", "w") as file:
+            file.write(self.raw_data)

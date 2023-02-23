@@ -57,3 +57,7 @@ class Candlestick():
         self.trend_direction = ""
         self.is_support = False
         self.is_resistance = False
+        self.next_resistance_candlestick_number = "" 
+        self.previous_resistance_candlestick_number = "" 
+        self.next_support_candlestick_number = "" 
+        self.previous_support_candlestick_number = "" 

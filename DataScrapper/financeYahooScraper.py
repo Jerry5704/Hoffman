@@ -13,8 +13,8 @@ from DataHandler.configParser import configParser
 
 class financeYahooScraper():
 
-    def get_url(self):
-        return "https://finance.yahoo.com/quote/%5EDJI/history?period1=1643334840&period2=1674856022&interval=<frequency>&filter=history&frequency=1d&includeAdjustedClose=true&guccounter=1"
+    def get_url(self, index, start, finish):
+        return f"https://finance.yahoo.com/quote/%5E{index}/history?period1={start}&period2={finish}&interval=<frequency>&filter=history&frequency=1d&includeAdjustedClose=true&guccounter=1"
 
     def get_configParser(self):
         configParser = configparser.RawConfigParser()   
@@ -53,13 +53,15 @@ class financeYahooScraper():
         time.sleep(1)
         return self.driver.find_element(By.ID, "Col1-1-HistoricalDataTable-Proxy")
 
-    def __init__(self):
+    def __init__(self, index, start, finish):
         # Setup for finance.yahoo.com scraping
         self.configParser = self.get_configParser()
-        self.url = self.get_url()
+        self.url = self.get_url(index, start, finish)
         self.driver = self.get_driver()
         self.get_past_popups()
         self.scroll_down()
 
         # Data parse
         self.raw_data = self.get_raw_data().text
+
+        self.driver.quit()
