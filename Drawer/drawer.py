@@ -9,7 +9,8 @@ class drawer():
     def draw_line_chart(self):
         self.prices = self.dataParser.get_prices(len(self.candlesticks_list), 0)
 
-        y_axis = list(reversed(np.array(self.prices)))
+        y_axis = np.array(self.prices)
+        # y_axis = np.array(self.prices)
         
         # ToDo: change to actual dates
         x_axis = []
@@ -18,21 +19,22 @@ class drawer():
             x_axis.append(counter)
             counter += 1
 
-        x_axis = list(reversed(x_axis))
-
         plt.xlim([0, len(self.candlesticks_list)])
+
+        x_axis = list(reversed(x_axis))
 
         plt.plot(x_axis, y_axis, color="black")
 
         #  draw support lines
         for candlestick in self.candlesticks_list:
+        # for candlestick in list(reversed(self.candlesticks_list)):
             x_values = []
             y_values = []
             if candlestick.is_support:
-                x_values.append(candlestick.number + 0.5)   
-                x_values.append(candlestick.number + 1.5)   
+                x_values.append(candlestick.number - 1.0)   
+                x_values.append(candlestick.number + 1.0)   
                 y_values.append(candlestick.close)   
-                y_values.append(candlestick.close)   
+                y_values.append(candlestick.close)  
                 plt.plot(x_values, y_values, color="yellow")
 
         #  draw resistance lines
@@ -40,8 +42,8 @@ class drawer():
             x_values = []
             y_values = []
             if candlestick.is_resistance:
-                x_values.append(candlestick.number + 0.5)   
-                x_values.append(candlestick.number + 1.5)   
+                x_values.append(candlestick.number - 1.0)   
+                x_values.append(candlestick.number + 1.0)   
                 y_values.append(candlestick.close)   
                 y_values.append(candlestick.close)   
                 plt.plot(x_values, y_values, color="cyan")
@@ -51,8 +53,9 @@ class drawer():
             x_values = []
             y_values = []
             for candlestick in candlesticks_lists:
-                x_values.append(candlestick.number + 1)
+                x_values.append(candlestick.number)
                 y_values.append(candlestick.close)
+
             plt.plot(x_values, y_values, color="yellow")
         
         # draw down_trendlines
@@ -60,23 +63,24 @@ class drawer():
             x_values = []
             y_values = []
             for candlestick in candlesticks_lists:
-                x_values.append(candlestick.number + 1)
+                x_values.append(candlestick.number)
                 y_values.append(candlestick.close)
+
             plt.plot(x_values, y_values, color="cyan")
 
         # draw fans
         for fan_list in self.dataParser.fans_list:
-            x_values = [fan_list[0].number + 1, fan_list[-1][0] + 1]
+            x_values = [fan_list[0].number, fan_list[-1][0]]
             y_values = [fan_list[0].close, fan_list[-1][1]]
             plt.plot(x_values, y_values, color="pink")
 
         plt.show()
 
     def draw_candlestick_chart(self):
-        self.opens = list(reversed(self.dataParser.get_opens(len(self.candlesticks_list), 0)))
-        self.closes = list(reversed(self.dataParser.get_prices(len(self.candlesticks_list), 0)))
-        self.highs = list(reversed(self.dataParser.get_highs(len(self.candlesticks_list), 0)))
-        self.lows = list(reversed(self.dataParser.get_lows(len(self.candlesticks_list), 0)))
+        self.opens = self.dataParser.get_opens(len(self.candlesticks_list), 0)
+        self.closes = self.dataParser.get_prices(len(self.candlesticks_list), 0)
+        self.highs = self.dataParser.get_highs(len(self.candlesticks_list), 0)
+        self.lows = self.dataParser.get_lows(len(self.candlesticks_list), 0)
 
         data_frame = pd.DataFrame({
             'open': self.opens,

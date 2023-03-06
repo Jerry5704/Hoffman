@@ -32,11 +32,11 @@ class Candlestick():
         
         # Gathered data
         self.date = date
-        self.open = float(open.replace(',',''))
-        self.high = float(high.replace(',',''))
-        self.low = float(low.replace(',',''))
-        self.close = float(close.replace(',',''))
-        self.volume = float(volume.replace(',',''))
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
+        self.volume = volume
 
         # Known additional data
         self.color = self.get_color()
@@ -61,3 +61,5 @@ class Candlestick():
         self.previous_resistance_candlestick_number = "" 
         self.next_support_candlestick_number = "" 
         self.previous_support_candlestick_number = "" 
+        self.previous_candlestick = None 
+        self.next_candlestick = None

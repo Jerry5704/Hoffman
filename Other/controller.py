@@ -8,20 +8,20 @@ from DataHandler.configParser import configParser
 from Drawer.drawer import drawer
 
 
-l = [["DJI", "1550620800", "1676851200"], ["IXIC", "1550620800", "1676851200"], ["GSPC", "1550620800", "1676851200"], ["RUT", "1550620800", "1676851200"]]
+# data_list = [["DJI", "1671768778", "1677125581"], ["IXIC", "1671768778", "1677125581"], ["GSPC", "1671768778", "1677125581"], ["RUT", "1671768778", "1677125581"]]
+data_list = [["GSPC", "1551228962", "1677125581"]]
+average = 1
 
-# financeYahooScraper = financeYahooScraper("DJI", "1668902400", "1676764800")
-# financeYahooScraper = financeYahooScraper("IXIC", "1668902400", "1676764800")
+for idx, data in enumerate(data_list):
+    
+# Scrap data
+    # financeYahooScraper_xd = financeYahooScraper(data[0], data[1], data[2])
+    # dataParser_xd = dataParser(financeYahooScraper_xd.raw_data, financeYahooScraper_xd.configParser, average, idx)
 
-counter = 0
-for q in l:
-    # financeYahooScraper_xd = financeYahooScraper(q[0], q[1], q[2])
-    # dataParser_xd = dataParser(financeYahooScraper_xd.raw_data, financeYahooScraper_xd.configParser, counter)
-
+# Read data from files
     configParser_xd = configParser()
-    with open (f"../Other/data{counter}.text", "r") as file:
-        dataParser_xd = dataParser(file.read(), configParser, counter)
+    with open (f"../Other/data{idx}.text", "r") as file:
+        dataParser_xd = dataParser(file.read(), configParser, average, idx)
     
     drawer_xd = drawer(dataParser_xd)
 
-    counter += 1

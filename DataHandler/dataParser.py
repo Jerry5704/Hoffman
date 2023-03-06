@@ -38,20 +38,49 @@ class dataParser():
         elif month_name == "Dec":
             return 12
 
-    def get_candlesticks_list(self):
+    def get_candlesticks_list(self, average):
         list_of_candlesticks = []
-        for line in self.data_lines_list[4:-1]:
-            line_split = line.split(' ')
-            year = int(line_split[2])
-            month = self.get_month(line_split[0])
-            day = line_split[1].strip(',')
-            day_date = datetime.date(int(year), month, int(day))
-            open = line_split[3]
-            high = line_split[4]
-            low = line_split[5]
-            close = line_split[6]
-            volume = line_split[8]
-            list_of_candlesticks.append(Candlestick(day_date, open, high, low, close, volume))
+        if average == 1:
+            for line in self.data_lines_list[4:-1]:
+                line_split = line.split(' ')
+                year = int(line_split[2])
+                month = self.get_month(line_split[0])
+                day = line_split[1].strip(',')
+                day_date = datetime.date(int(year), month, int(day))
+                open = float(line_split[3].replace(",", ""))
+                high = float(line_split[4].replace(",", ""))
+                low = float(line_split[5].replace(",", ""))
+                close = float(line_split[6].replace(",", ""))
+                volume = float(line_split[8].replace(",", ""))
+                list_of_candlesticks.append(Candlestick(day_date, open, high, low, close, volume))
+        elif average > 1:
+            list_of_average_candlesticks = []
+            for i in range(0, len(self.data_lines_list[4:-1]), average):
+                list_of_average_candlesticks.append(self.data_lines_list[4:-1][i:i + average])
+            for average_candlesticks_list in list_of_average_candlesticks:
+                average_open = 0
+                average_high = 0
+                average_low = 0
+                average_close = 0
+                average_volume = 0
+                for candlestick in average_candlesticks_list:
+                    candlestick_split = candlestick.split(' ')
+                    year = int(candlestick_split[2])
+                    month = self.get_month(candlestick_split[0])
+                    day = candlestick_split[1].strip(',')
+                    day_date = datetime.date(int(year), month, int(day))
+                    average_open += float(candlestick_split[3].replace(",", ""))
+                    average_high += float(candlestick_split[4].replace(",", ""))
+                    average_low += float(candlestick_split[5].replace(",", ""))
+                    average_close += float(candlestick_split[6].replace(",", ""))
+                    average_volume += float(candlestick_split[8].replace(",", ""))
+                average_open = average_open / average
+                average_high = average_high / average
+                average_low = average_low / average
+                average_close = average_close / average
+                average_volume = average_volume / average
+                list_of_candlesticks.append(Candlestick(day_date, average_open, average_high, average_low, average_close, average_volume))
+                
         return list_of_candlesticks
 
     def get_avreage_candlestick_body(self):
@@ -97,35 +126,33 @@ class dataParser():
             return False
         return False
 
-    def get_next_resistance_candlestick_number(self, candlestick, current_candlestick_index):
+    def get_next_resistance_candlestick(self, candlestick, current_candlestick_index):
         for candlestick in self.candlesticks_list[current_candlestick_index + 1:]:
             if candlestick.is_resistance:
-                return candlestick.number
+                return candlestick
 
-    def get_next_support_candlestick_number(self, candlestick, current_candlestick_index):
+    def get_next_support_candlestick(self, candlestick, current_candlestick_index):
         for candlestick in self.candlesticks_list[current_candlestick_index + 1:]:
             if candlestick.is_support:
-                return candlestick.number
+                return candlestick
 
-    def get_previous_resistance_candlestick_number(self, candlestick, current_candlestick_index):
+    def get_previous_resistance_candlestick(self, candlestick, current_candlestick_index):
         for candlestick in reversed(self.candlesticks_list[:current_candlestick_index - 1]):
             if candlestick.is_resistance:
-                return candlestick.number
+                return candlestick
         
-    def get_previous_support_candlestick_number(self, candlestick, current_candlestick_index):
+    def get_previous_support_candlestick(self, candlestick, current_candlestick_index):
         for candlestick in reversed(self.candlesticks_list[:current_candlestick_index - 1]):
             if candlestick.is_support:
-                return candlestick.number
+                return candlestick
 
-    def classify_candlestick(self, candlestick, current_candlestick_index):
-        candlestick.number = current_candlestick_index
+    def classify_candlestick(self, candlestick, current_candlestick_index, number_of_candlesticks):
+        candlestick.number = number_of_candlesticks - current_candlestick_index
+        # candlestick.number = current_candlestick_index
         candlestick.length_type = self.get_candlesticks_length_type(candlestick, current_candlestick_index)
         candlestick.pattern = self.get_pattern(candlestick)
         candlestick.is_support = self.get_is_support(candlestick, current_candlestick_index)
         candlestick.is_resistance = self.get_is_resistance(candlestick, current_candlestick_index)
-
-        current_candlestick_index += 1
-        return candlestick
 
     def get_prices(self, days, current_candlestick_index):
         return [candlestick.close for candlestick in self.candlesticks_list[current_candlestick_index : current_candlestick_index + 1 + days]]
@@ -142,22 +169,10 @@ class dataParser():
     def get_dates(self, days, current_candlestick_index):
         return [candlestick.date for candlestick in self.candlesticks_list[current_candlestick_index: current_candlestick_index + 1 + days]]
 
-    def get_ema(self, days, current_candlestick_index):
-        self.prices = pd.DataFrame(
-            {'Stock_Values': self.get_prices(days, current_candlestick_index)})
-        return self.prices.ewm(com=0.4).mean()
-
     def classify_candlesticks_list(self):
-        current_candlestick_index = 0
-        for candlestick in self.candlesticks_list:
-            self.classify_candlestick(candlestick, current_candlestick_index)
-            current_candlestick_index += 1
-
-    def get_resistance_points_list(self):
-        current_candlestick_index = 0
-        for candlestick in self.candlesticks_list:
-            self.classify_candlestick(candlestick, current_candlestick_index)
-            current_candlestick_index += 1
+        number_of_candlesticks = len(self.candlesticks_list)
+        for current_candlestick_index, candlestick in enumerate(self.candlesticks_list):
+            self.classify_candlestick(candlestick, current_candlestick_index, number_of_candlesticks)
 
     def get_up_trendLine_candlesticks_list(self):
         return TrendLine("up", self.support_candlesticks_list).trends_list
@@ -169,12 +184,9 @@ class dataParser():
         return Fan(self.candlesticks_list, self.up_trendLine_candlesticks_list, self.down_trendLine_candlesticks_list).fans_list
     
     def print_candlesticks(self):
-        candlestick_number = 0
         for candlestick in self.candlesticks_list:
-            candlestick_number += 1
-            # if candlestick.is_support is True:
             print("================================")
-            print(f"candlestick number: {candlestick_number}")
+            print(f"candlestick number: {candlestick.number}")
             print(f"date: {candlestick.date}")
             print(f"open: {candlestick.open}")
             print(f"close: {candlestick.close}")
@@ -193,16 +205,15 @@ class dataParser():
             print(f"is resistance: {candlestick.is_resistance}")
             print("================================")
 
-    def __init__(self, raw_data, configParser, counter):
+    def __init__(self, raw_data, configParser, average, counter):
         self.now = datetime
         self.raw_data = raw_data
         self.configParser = configparser
         self.frequency = self.get_frequency()
         self.data_lines_list = [line for line in self.raw_data.split('\n') if line != "Download"]
-        self.candlesticks_list = self.get_candlesticks_list()
+        self.candlesticks_list = self.get_candlesticks_list(average)
         self.classify_candlesticks_list()
 
-        # self.print_candlesticks()
 
         self.resistance_candlesticks_list = [candlestick for candlestick in self.candlesticks_list if candlestick.is_resistance]
         self.support_candlesticks_list = [candlestick for candlestick in self.candlesticks_list if candlestick.is_support]
@@ -220,3 +231,5 @@ class dataParser():
 
         with open (f"data{counter}.text", "w") as file:
             file.write(self.raw_data)
+        
+        # self.print_candlesticks()
