@@ -69,7 +69,7 @@ class drawer():
             plt.plot(x_values, y_values, color="cyan")
 
         # draw fans
-        for fan_list in self.dataParser.fans_list:
+        for fan_list in self.dataParser.fans_to_draw_list:
             x_values = [fan_list[0].number, fan_list[-1][0]]
             y_values = [fan_list[0].close, fan_list[-1][1]]
             plt.plot(x_values, y_values, color="pink")
